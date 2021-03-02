@@ -15,10 +15,11 @@ from pydub import AudioSegment
 #拷贝下载的 bin 到py项目文件夹 否则会报错，找不到文件路径
 
 Path_dir='C:\\Users\\pengchong\\Desktop\\新建文件夹\\'
+AudioType='.mp3' # if u want read .wav,replace it to '.wav'
 def GetMP3Files(TargetPath):
     for parent,dirnames,filenames in os.walk(TargetPath):
         dirnames[:]=[d for d in dirnames if d not in['someenv','__pycache__']]
-        filenames[:]= [f for f in filenames if f.endswith(".mp3")]
+        filenames[:]= [f for f in filenames if f.endswith(AudioType)]
         return filenames
 
 def CutAudio(files):
@@ -35,7 +36,7 @@ def CutAudio(files):
                    # pydub does things in milliseconds
                    start=tg[0][times].minTime*1000
                    end=tg[0][times].maxTime*1000
-                   Sound[start:end].export(('./out/'+head+str(saveid)+'.mp3'),format='mp3')
+                   Sound[start:end].export(('./out/'+head+str(saveid)+AudioType),format='mp3')
                    saveid+=1
 
 if __name__== '__main__':
