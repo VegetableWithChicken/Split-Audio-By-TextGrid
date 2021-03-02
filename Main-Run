@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+import os
+import numpy as np
+import pydub
+import matplotlib.pyplot as plt
+import textgrid 
+from pydub import AudioSegment
+
+# textGrid setting :
+# Minimum pitch(HZ) 20
+# Mininum silent interval duration 1
+# Minimum sounding interval duration 0.1
+
+#ffmpeg bin 文件下载： https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z
+#拷贝下载的 bin 到py项目文件夹 否则会报错，找不到文件路径
+
+Path_dir='C:\\Users\\pengchong\\Desktop\\新建文件夹\\'
+def GetMP3Files(TargetPath):
+    for parent,dirnames,filenames in os.walk(TargetPath):
+        dirnames[:]=[d for d in dirnames if d not in['someenv','__pycache__']]
+        filenames[:]= [f for f in filenames if f.endswith(".mp3")]
+        return filenames
+
+def CutAudio(files):
+    for allname in files:
+       saveid = 0
+       Sound = AudioSegment.from_mp3(allname)  # 声音文件
+       head=os.path.splitext(allname)[0]
+       textname=head +'.TextGrid'  #TextGrid 分段文件
+       tg=textgrid.TextGrid.fromFile(Path_dir+textname)
+       values=len(tg[0].intervals)# 分段长度
+       if not Sound.empty():
+           for times in range(len(tg[0].intervals)):
+               if tg[0][times].mark=='sounding':
+                   # pydub does things in milliseconds
+                   start=tg[0][times].minTime*1000
+                   end=tg[0][times].maxTime*1000
+                   Sound[start:end].export(('./out/'+head+str(saveid)+'.mp3'),format='mp3')
+                   saveid+=1
+
+if __name__== '__main__':
+    files=GetMP3Files(Path_dir)
+    CutAudio(files)
+
+    
+        
+
+
